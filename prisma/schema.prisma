@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id          Int           @id @default(autoincrement())
+  username    String        @default("")
+  password    String        @default("")
+  role        Role
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @default(now()) @updatedAt
+  transaction transaction[]
+}
+
+model item {
+  id          Int           @id @default(autoincrement())
+  name        String        @default("")
+  category    String        @default("")
+  location    String        @default("")
+  stock       Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @default(now()) @updatedAt
+  transaction transaction[]
+}
+
+model transaction {
+  id               Int      @id @default(autoincrement())
+  user_id          Int      @default(0)
+  item_id          Int      @default(0)
+  quantity         Int      @default(0)
+  borrow_date      DateTime @default(now())
+  return_date      DateTime @default(now())
+  actualReturnDate DateTime @default(now())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @default(now()) @updatedAt
+  userId           user     @relation(fields: [user_id], references: [id])
+  itemId           item     @relation(fields: [item_id], references: [id])
+}
+
+enum Role {
+  Admin
+  Member
+}
